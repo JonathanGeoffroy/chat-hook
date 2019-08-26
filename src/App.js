@@ -1,26 +1,27 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useState, useEffect} from 'react';
+import {Search} from "./Search";
+import {Messages} from "./Messages";
+
+import {ChatService} from "./ChatService";
+
+const chatService = new ChatService();
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [room, setRoom] = useState('React');
+    const [messages, setMessages] = useState([]);
+
+    useEffect(() => {
+        chatService.subscribe(room, m => {
+            setMessages(newMessages => [m, ...newMessages]);
+        });
+
+        return () => chatService.unsubscribe(room);
+    }, [room]);
+
+    return <>
+        <Search onChange={setRoom}/>
+        <Messages messages={messages}/>
+    </>;
 }
 
 export default App;
